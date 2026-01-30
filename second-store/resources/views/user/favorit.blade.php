@@ -1,11 +1,8 @@
-{{-- resources/views/user/favorit.blade.php --}}
-
 <style>
     :root {
-        --blue: #4B6CB7;
-        --blue-dark: #1F3B6B;
-        --blue-soft: #6C8CD5;
-        --soft-gray: #D1D5DB;
+        --gray-dark: #374151;       /* pengganti blue-dark */
+        --gray: #6B7280;            /* pengganti blue */
+        --gray-soft: #D1D5DB;       /* soft border */
         --text-dark: #1E293B;
         --accent: #FFD166;
         --card-bg: #ffffff;
@@ -15,7 +12,7 @@
         text-align: center;
         font-size: 2rem;
         font-weight: 800;
-        color: var(--blue-dark);
+        color: var(--gray-dark);
         margin: 30px 0 40px;
     }
 
@@ -29,7 +26,7 @@
     .product-card {
         border-radius: 0;
         background: var(--card-bg);
-        border: 1px solid var(--soft-gray);
+        border: 1px solid var(--gray-soft);
         transition: .4s cubic-bezier(.4,0,.2,1);
         position: relative;
         overflow: hidden;
@@ -39,7 +36,7 @@
     .product-card:hover {
         transform: translateY(-8px);
         box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-        border-color: var(--blue);
+        border-color: var(--gray);
     }
 
     .product-card img {
@@ -53,13 +50,13 @@
     .price-tag {
         font-weight: 700;
         font-size: 16px;
-        color: var(--blue);
+        color: var(--gray);
         margin-top: 5px;
     }
 
     .old-price {
         text-decoration: line-through;
-        color: var(--soft-gray);
+        color: var(--gray-soft);
         font-size: 14px;
         margin-left: 5px;
     }
@@ -83,7 +80,7 @@
     }
 
     .badge-best {
-        background: linear-gradient(135deg,#10B981,#22C55E);
+        background: linear-gradient(135deg,#6B7280,#9CA3AF); /* abu-abu */
         right: 0;
         left:auto;
         border-top-left-radius: 10px;
@@ -111,17 +108,17 @@
     }
 
     .remove-fav-btn:hover {
-        background: #ff3b30;
+        background: #9CA3AF; /* abu-abu saat hover */
         color: white;
         transform: scale(1.15);
-        box-shadow: 0 0 20px rgba(255,59,48,0.6);
+        box-shadow: 0 0 20px rgba(156,163,175,0.6);
     }
 
     .burst {
         position: absolute;
         width: 140px;
         height: 140px;
-        background: radial-gradient(circle, rgba(255, 59, 48, 0.4) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(156,163,175,0.4) 0%, transparent 70%);
         border-radius: 50%;
         pointer-events: none;
         z-index: 5;
@@ -155,8 +152,33 @@
     .empty-fav h4 {
         font-size: 1.5rem;
         font-weight: 700;
-        color: var(--blue-dark);
+        color: var(--gray-dark);
         margin-bottom: 12px;
+    }
+
+    /* Tombol lihat detail diganti abu-abu */
+    .product-card .btn {
+        background-color: var(--gray);
+        border-color: var(--gray);
+        color: white;
+    }
+
+    .product-card .btn:hover {
+        background-color: var(--gray-dark);
+        border-color: var(--gray-dark);
+        color: white;
+    }
+
+    .empty-fav .btn {
+        background-color: var(--gray);
+        border-color: var(--gray);
+        color: white;
+    }
+
+    .empty-fav .btn:hover {
+        background-color: var(--gray-dark);
+        border-color: var(--gray-dark);
+        color: white;
     }
 </style>
 
@@ -204,7 +226,7 @@
                         if($product->variants->count() > 0){
                             $minHarga = $product->variants->min('harga');
                             $maxHarga = $product->variants->max('harga');
-                            $harga = number_format($minHarga,0,',','.') . ($minHarga != $maxHarga ? ' - '. number_format($maxHarga,0,',','.') : '');
+                            $harga = number_format($minHarga,0,',','.') . ($minHarga != $maxHarga ? ' - '. number_format($maxHarga,0,',','.') : '' );
                         } else {
                             $harga = number_format($product->harga,0,',','.');
                         }
@@ -218,7 +240,7 @@
                         @endif
                     </div>
 
-                    <a href="{{ route('produk.show', $product->slug) }}" class="btn btn-primary btn-sm mt-2 px-4 py-1">
+                    <a href="{{ route('produk.show', $product->slug) }}" class="btn btn-sm mt-2 px-4 py-1">
                         Lihat Detail
                     </a>
                 </div>
@@ -231,14 +253,13 @@
             <p class="mb-4">
                 Yuk tambahkan produk yang kamu suka dengan klik ikon ❤️ di halaman produk!
             </p>
-            <a href="{{ route('home') }}" class="btn btn-primary px-5 py-3 rounded-pill">
+            <a href="{{ route('home') }}" class="btn px-5 py-3 rounded-pill">
                 <i class="bi bi-shop me-2"></i> Mulai Belanja Sekarang
             </a>
         </div>
     @endforelse
 </div>
 
-{{-- Efek Burst Saat Hapus Favorit --}}
 <script>
     document.querySelectorAll('.remove-fav-btn').forEach(btn => {
         btn.addEventListener('click', function (e) {

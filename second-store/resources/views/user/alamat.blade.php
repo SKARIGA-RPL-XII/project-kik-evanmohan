@@ -1,5 +1,3 @@
-{{-- resources/views/user/alamat.blade.php --}}
-
 <h5 class="mb-4">Daftar Alamat Pengiriman</h5>
 
 {{-- Notifikasi sukses --}}
@@ -14,7 +12,7 @@
     <div class="text-center py-5 text-muted">
         <i class="bi bi-geo-alt fs-1"></i>
         <p class="mt-3">Belum ada alamat tersimpan</p>
-        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambahAlamat">
+        <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambahAlamat">
             + Tambah Alamat Pertama
         </button>
     </div>
@@ -22,22 +20,21 @@
 
     {{-- TOMBOL TAMBAH ALAMAT BARU --}}
     <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambahAlamat">
+        <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambahAlamat">
             + Tambah Alamat Baru
         </button>
     </div>
 
     @php
-        // --- SORTING: Alamat utama muncul paling atas ---
         $alamats = auth()->user()->alamats->sortByDesc('is_utama');
     @endphp
 
     {{-- Loop semua alamat user --}}
     @foreach($alamats as $alamat)
-        <div class="p-4 bg-light rounded mb-3 border {{ $alamat->is_utama ? 'border-primary border-3' : '' }} position-relative">
+        <div class="p-4 bg-light rounded mb-3 border {{ $alamat->is_utama ? 'border-secondary border-3' : '' }} position-relative">
 
             @if($alamat->is_utama)
-                <span class="badge bg-success position-absolute top-0 end-0 mt-2 me-3">
+                <span class="badge bg-secondary position-absolute top-0 end-0 mt-2 me-3">
                     Alamat Utama
                 </span>
             @endif
@@ -46,16 +43,16 @@
                 <h6 class="mb-1">{{ $alamat->nama_penerima }}</h6>
                 <p class="mb-1 small text-muted">
                     {{ $alamat->alamat_lengkap }}<br>
-                    {{ $alamat->kecamatan }}, {{ $alamat->kota}}, {{ $alamat->provinsi }} {{ $alamat->kode_pos }}
+                    {{ $alamat->kecamatan }}, {{ $alamat->kota }}, {{ $alamat->provinsi }} {{ $alamat->kode_pos }}
                     @if($alamat->patokan)
-                        <br><small class="text-primary">Patokan: {{ $alamat->patokan }}</small>
+                        <br><small class="text-secondary">Patokan: {{ $alamat->patokan }}</small>
                     @endif
                 </p>
             </div>
 
             <div class="mt-3 d-flex gap-2 flex-wrap">
                 <!-- Tombol Edit -->
-                <button type="button" class="btn btn-sm btn-outline-warning"
+                <button type="button" class="btn btn-sm btn-outline-secondary"
                         onclick="editAlamat({{ $alamat->toJson() }})">
                     Ubah
                 </button>
@@ -72,7 +69,7 @@
                 @if(!$alamat->is_utama)
                     <form action="{{ route('alamat.setPrimary', $alamat->id) }}" method="POST" class="d-inline">
                         @csrf
-                        <button type="submit" class="btn btn-sm btn-outline-success">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">
                             Jadikan Utama
                         </button>
                     </form>
@@ -127,8 +124,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Alamat</button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-secondary">Simpan Alamat</button>
                 </div>
             </div>
         </form>

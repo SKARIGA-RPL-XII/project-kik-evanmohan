@@ -154,8 +154,10 @@ Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(functi
 Route::middleware(['auth'])->group(function () {
 
     // PROFILE
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::get('/profil/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profil/update', [ProfileController::class, 'update'])->name('profile.update');
+
 
 
     Route::get('/profil/alamat', [AlamatController::class, 'index'])->name('alamat.index');
