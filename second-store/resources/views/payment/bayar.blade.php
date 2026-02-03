@@ -109,7 +109,7 @@
             <div class="bank-box mt-4">
                 <h6 class="fw-bold mb-1">Transfer ke:</h6>
                 <p class="mb-0">BANK BCA - <strong>1234567890</strong></p>
-                <p class="mb-0">a.n. <strong>Toko Laravel</strong></p>
+                <p class="mb-0">a.n. <strong>Second Store</strong></p>
             </div>
 
             @if(!$pesanan->buktiPembayaran)

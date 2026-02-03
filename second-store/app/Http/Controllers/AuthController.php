@@ -5,114 +5,79 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 
 class AuthController extends Controller
 {
-    /**
-     * Tampilkan halaman login
-     */
     public function showLogin()
     {
         return view('auth.login');
     }
 
-    /**
-     * Proses login
-     */
     public function login(Request $request)
     {
-        try {
-            $credentials = $request->validate([
-                'email' => 'required|email',
-                'password' => 'required',
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        if (Auth::attempt($request->only('email', 'password'))) {
+            $request->session()->regenerate();
+
+            $role = Auth::user()->role;
+
+            // JSON response untuk AJAX
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Login berhasil!',
+                'redirect' => $role === 'admin' ? route('admin.dashboard') : route('home')
             ]);
-
-            if (Auth::attempt($credentials)) {
-                $request->session()->regenerate();
-
-                // Jika admin → ke dashboard
-                if (Auth::user()->role === 'admin') {
-                    return redirect()->route('admin.dashboard');
-                }
-
-                // Jika ada "redirect=url"
-                if ($request->has('redirect')) {
-                    return redirect()->to($request->query('redirect'));
-                }
-
-                // Balik ke halaman sebelumnya
-                return redirect()->back();
-            }
-
-            return back()->withErrors([
-                'email' => 'Email atau password salah.',
-            ])->onlyInput('email');
-
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Email atau password salah!'
+        ], 422);
     }
 
-    /**
-     * Tampilkan halaman register
-     */
     public function showRegister()
     {
         return view('auth.register');
     }
 
-    /**
-     * Proses register
-     */
     public function register(Request $request)
     {
-        try {
-            $request->validate([
-                'username' => 'required|string|unique:users,username|max:50',
-                'email' => 'required|email|unique:users,email',
-                'no_hp' => 'nullable|string|max:20',
-                'password' => 'required|string|min:3|confirmed',
-                'role' => 'in:admin,customer',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // Validasi file image
-            ]);
+        $request->validate([
+            'username' => 'required|string|max:50|unique:users,username',
+            'email' => 'required|email|unique:users,email',
+            'no_hp' => 'nullable|string|max:20',
+            'password' => 'required|string|min:3|confirmed',
+            'role' => 'in:admin,customer',
+        ]);
 
-            // Simpan file image jika ada
-            if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('users', 'public');
-            } else {
-                $imagePath = null;
-            }
+        User::create([
+            'username' => $request->username,
+            'email' => $request->email,
+            'no_hp' => $request->no_hp,
+            'password' => Hash::make($request->password),
+            'role' => $request->role ?? 'customer',
+        ]);
 
-            User::create([
-                'email' => $request->email,
-                'no_hp' => $request->no_hp,
-                'username' => $request->username,
-                'password' => Hash::make($request->password),
-                'role' => $request->role ?? 'customer',
-                'image' => $imagePath,
-            ]);
-
-            return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login.');
-
-        } catch (\Exception $e) {
-            return back()->withErrors([
-                'error' => 'Terjadi kesalahan saat registrasi: ' . $e->getMessage()
-            ]);
-        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Registrasi berhasil! Silakan login.',
+            'redirect' => route('login')
+        ]);
     }
 
-    /**
-     * Logout
-     */
-    public function logout(Request $request)
-    {
-        Auth::logout();
+   public function logout(Request $request)
+{
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+    // Set session flash agar toast muncul di halaman login/home
+    return redirect()->route('home')->with('logout_success', true);
+}
 
-        return redirect()->route('home');
-    }
 }
