@@ -1,4 +1,3 @@
-{{-- resources/views/payment/index.blade.php --}}
 @extends('home.app')
 
 @section('content')
@@ -133,6 +132,15 @@
         font-size: 14px;
         color: #555;
     }
+
+    .alamat-box {
+        font-size: 14px;
+        background: #f8f9fc;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #e4e7ec;
+    }
 </style>
 
 <div class="container payment-container">
@@ -163,10 +171,8 @@
 
                 @if($order->status == 'PAID')
                     <span class="status-badge badge-paid">Sudah Dibayar</span>
-
                 @elseif($order->status == 'CANCELED')
                     <span class="status-badge" style="background:#dc3545; color:white;">Dibatalkan</span>
-
                 @else
                     <span class="status-badge badge-pending">Belum Dibayar</span>
                 @endif
@@ -174,6 +180,18 @@
 
             <p><strong>Total Bayar:</strong> Rp {{ number_format($order->total_bayar, 0, ',', '.') }}</p>
             <p><strong>Tanggal:</strong> {{ $order->created_at->format('d M Y - H:i') }}</p>
+
+            {{-- ALAMAT LENGKAP --}}
+            @if($order->alamat)
+                <div class="alamat-box">
+                    <strong>Alamat Pengiriman:</strong><br>
+                    {{ $order->alamat->alamat_lengkap ?? '-' }},
+                    {{ $order->alamat->kecamatan ?? '-' }},
+                    {{ $order->alamat->kota ?? '-' }},
+                    {{ $order->alamat->provinsi ?? '-' }} -
+                    Kode Pos: {{ $order->alamat->kode_pos ?? '-' }}
+                </div>
+            @endif
 
             <button class="collapse-btn" data-bs-toggle="collapse" data-bs-target="#detail-{{ $order->id }}">
                 Lihat Detail Produk ▼
@@ -188,10 +206,10 @@
                             @if($item->variant || $item->size)
                                 <div class="product-details">
                                     @if($item->variant)
-                                        Variant: {{ $item->variant }}
+                                        Variant: {{ $item->variant->warna ?? '-' }}
                                     @endif
                                     @if($item->size)
-                                        | Size: {{ $item->size }}
+                                        | Size: {{ $item->size->size ?? '-' }}
                                     @endif
                                 </div>
                             @endif
@@ -203,7 +221,6 @@
 
             @if($order->status == 'NOT PAID')
                 <div class="mt-3 d-flex gap-2 justify-content-end">
-
                     <a href="{{ route('payment.bayar', $order->id) }}" class="btn-tokped-pay">
                         Bayar Sekarang
                     </a>
@@ -211,7 +228,6 @@
                     <button class="btn-tokped-cancel" data-bs-toggle="modal" data-bs-target="#cancelModal-{{ $order->id }}">
                         Batal Pemesanan
                     </button>
-
                 </div>
             @endif
 
@@ -221,28 +237,21 @@
         <div class="modal fade" id="cancelModal-{{ $order->id }}" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content" style="border-radius: 12px;">
-
                     <div class="modal-header">
                         <h5 class="modal-title">Konfirmasi Pembatalan</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-
                     <div class="modal-body">
                         <p>Apakah Anda yakin ingin membatalkan pesanan <strong>#{{ $order->kode_order }}</strong>?</p>
                         <p class="text-danger fw-bold">Tindakan ini tidak bisa dibatalkan.</p>
                     </div>
-
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Tidak
-                        </button>
-
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
                         <form action="{{ route('payment.cancel', $order->id) }}" method="POST">
                             @csrf
                             <button type="submit" class="btn btn-danger">Ya, Batalkan</button>
                         </form>
                     </div>
-
                 </div>
             </div>
         </div>

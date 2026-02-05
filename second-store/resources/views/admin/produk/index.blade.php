@@ -3,7 +3,6 @@
 @section('content')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-<!-- CropperJS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
@@ -18,9 +17,10 @@
             </div>
 
             <div class="card-body px-0 pt-0 pb-2">
-                @if (session('success'))
+                {{-- Alert success manual dikomentari karena sudah diganti SweetAlert Toast --}}
+                {{-- @if (session('success'))
                     <div class="alert alert-success mx-3 mt-3">{{ session('success') }}</div>
-                @endif
+                @endif --}}
 
                 <div class="table-responsive p-3">
                     <table class="table table-hover align-items-center mb-0">
@@ -58,17 +58,16 @@
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
 
-                                        <form action="{{ route('admin.produk.destroy', $p->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus produk ini?')">
+                                        <form action="{{ route('admin.produk.destroy', $p->id) }}" method="POST" class="form-delete">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="btn btn-danger btn-sm mx-1">
+                                            <button type="button" class="btn btn-danger btn-sm mx-1 btn-hapus">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
                                     </td>
                                 </tr>
 
-                                <!-- Modal Edit Produk -->
                                 <div class="modal fade" id="modalEditProduk{{ $p->id }}" tabindex="-1">
                                     <div class="modal-dialog modal-dialog-centered modal-lg">
                                         <div class="modal-content">
@@ -77,7 +76,7 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
 
-                                            <form action="{{ route('admin.produk.update', $p->id) }}" method="POST" enctype="multipart/form-data">
+                                            <form action="{{ route('admin.produk.update', $p->id) }}" method="POST" enctype="multipart/form-data" class="form-proses">
                                                 @csrf
                                                 @method('PUT')
                                                 <div class="modal-body">
@@ -136,11 +135,10 @@
     </div>
 </div>
 
-<!-- Modal Tambah Produk -->
 <div class="modal fade" id="modalTambahProduk" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-            <form action="{{ route('admin.produk.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.produk.store') }}" method="POST" enctype="multipart/form-data" class="form-proses">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Produk</h5>
@@ -176,8 +174,8 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button class="btn btn-primary">Simpan</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
 
             </form>
@@ -186,9 +184,6 @@
 </div>
 
 
-<!-- =============================== -->
-<!-- MODAL CROP GAMBAR -->
-<!-- =============================== -->
 <div class="modal fade" id="modalCropImage" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -211,58 +206,126 @@
     </div>
 </div>
 
+{{-- SweetAlert2 Script --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<!-- =============================== -->
-<!-- SCRIPT CROP GAMBAR -->
-<!-- =============================== -->
 <script>
-let cropper;
-let targetInput;
+document.addEventListener('DOMContentLoaded', function() {
 
-// SEMUA INPUT FILE DIAMBIL
-document.querySelectorAll('.image-cropper-input').forEach(input => {
-    input.addEventListener('change', function (e) {
-        targetInput = this;
-        const file = e.target.files[0];
-        if (!file) return;
+    // 1. CONFIG SWEETALERT TOAST
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
 
-        const reader = new FileReader();
-        reader.onload = function (event) {
-            document.getElementById('previewCrop').src = event.target.result;
-            let modal = new bootstrap.Modal(document.getElementById('modalCropImage'));
-            modal.show();
+    // Munculkan Toast jika ada session sukses
+    @if (session('success'))
+        Toast.fire({
+            icon: "success",
+            title: "{{ session('success') }}"
+        });
+    @endif
 
-            if (cropper) cropper.destroy();
-
-            cropper = new Cropper(document.getElementById('previewCrop'), {
-                aspectRatio: 1,
-                viewMode: 1,
-                autoCropArea: 1,
-                movable: true,
-                zoomable: true
+    // 2. LOADING STATE SAAT SUBMIT FORM
+    const forms = document.querySelectorAll('.form-proses');
+    forms.forEach(form => {
+        form.addEventListener('submit', function() {
+            Swal.fire({
+                title: 'Memproses...',
+                text: 'Harap tunggu sebentar',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
             });
-        };
-        reader.readAsDataURL(file);
-    });
-});
-
-document.getElementById('btnCrop').addEventListener('click', function () {
-    if (!cropper) return;
-
-    const canvas = cropper.getCroppedCanvas({
-        width: 600,
-        height: 600
+        });
     });
 
-    canvas.toBlob(blob => {
-        const croppedFile = new File([blob], "cropped.jpg", { type: "image/jpeg" });
+    // 3. KONFIRMASI HAPUS DENGAN LOADING
+    const deleteButtons = document.querySelectorAll('.btn-hapus');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const form = this.closest('form');
+            Swal.fire({
+                title: "Apakah Anda yakin?",
+                text: "Produk akan dihapus permanen!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: "Ya, Hapus!",
+                cancelButtonText: "Batal"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Menghapus...',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    form.submit();
+                }
+            });
+        });
+    });
 
-        const dt = new DataTransfer();
-        dt.items.add(croppedFile);
-        targetInput.files = dt.files;
+    // 4. LOGIKA CROPPER JS
+    let cropper;
+    let targetInput;
 
-        bootstrap.Modal.getInstance(document.getElementById('modalCropImage')).hide();
-    }, "image/jpeg", 0.9);
+    document.querySelectorAll('.image-cropper-input').forEach(input => {
+        input.addEventListener('change', function (e) {
+            targetInput = this;
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                document.getElementById('previewCrop').src = event.target.result;
+                let modal = new bootstrap.Modal(document.getElementById('modalCropImage'));
+                modal.show();
+
+                if (cropper) cropper.destroy();
+
+                cropper = new Cropper(document.getElementById('previewCrop'), {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCropArea: 1,
+                    movable: true,
+                    zoomable: true
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    document.getElementById('btnCrop').addEventListener('click', function () {
+        if (!cropper) return;
+
+        const canvas = cropper.getCroppedCanvas({
+            width: 600,
+            height: 600
+        });
+
+        canvas.toBlob(blob => {
+            const croppedFile = new File([blob], "cropped.jpg", { type: "image/jpeg" });
+            const dt = new DataTransfer();
+            dt.items.add(croppedFile);
+            targetInput.files = dt.files;
+
+            bootstrap.Modal.getInstance(document.getElementById('modalCropImage')).hide();
+        }, "image/jpeg", 0.9);
+    });
 });
 </script>
 

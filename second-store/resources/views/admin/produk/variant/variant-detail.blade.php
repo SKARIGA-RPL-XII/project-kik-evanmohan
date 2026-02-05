@@ -5,7 +5,6 @@
 
 <div class="row mt-4 mx-4">
     <div class="col-12">
-
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
@@ -21,11 +20,10 @@
             </div>
 
             <div class="card-body">
-
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <img src="{{ $variant->image ? asset('storage/' . $variant->image) : asset('argon/assets/img/default-product.png') }}"
-                             class="img-fluid rounded" style="object-fit: cover;">
+                             class="img-fluid rounded" style="object-fit: cover; max-height: 200px;">
                     </div>
                     <div class="col-md-8">
                         <h5>Harga: Rp {{ number_format($variant->harga, 0, ',', '.') }}</h5>
@@ -57,26 +55,26 @@
                                         <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditSize{{ $size->id }}">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
-                                        <form action="{{ route('admin.variant.size.destroy', $size->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus size ini?')">
+
+                                        <form action="{{ route('admin.variant.size.destroy', $size->id) }}" method="POST" class="d-inline form-delete">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="btn btn-danger btn-sm">
+                                            <button type="button" class="btn btn-danger btn-sm btn-hapus">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
                                     </td>
                                 </tr>
 
-                                <!-- Modal Edit Size -->
                                 <div class="modal fade" id="modalEditSize{{ $size->id }}" tabindex="-1">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
-                                            <form action="{{ route('admin.variant.size.update', $size->id) }}" method="POST">
+                                            <form action="{{ route('admin.variant.size.update', $size->id) }}" method="POST" class="form-proses">
                                                 @csrf
                                                 @method('PUT')
                                                 <div class="modal-header">
                                                     <h5>Edit Size</h5>
-                                                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                 </div>
                                                 <div class="modal-body">
                                                     <div class="mb-3">
@@ -89,8 +87,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                    <button class="btn btn-primary">Simpan</button>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                    <button type="submit" class="btn btn-primary">Simpan</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -105,22 +103,19 @@
                         </tbody>
                     </table>
                 </div>
-
             </div>
         </div>
-
     </div>
 </div>
 
-<!-- Modal Tambah Size -->
 <div class="modal fade" id="modalTambahSize" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form action="{{ route('admin.variant.size.store', $variant->id) }}" method="POST">
+            <form action="{{ route('admin.variant.size.store', $variant->id) }}" method="POST" class="form-proses">
                 @csrf
                 <div class="modal-header">
                     <h5>Tambah Size untuk {{ $variant->warna }}</h5>
-                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
@@ -133,11 +128,81 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button class="btn btn-success">Simpan</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success">Simpan</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+{{-- SweetAlert2 Script --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // 1. Konfigurasi Toast Sukses
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+    });
+
+    @if (session('success'))
+        Toast.fire({
+            icon: "success",
+            title: "{{ session('success') }}"
+        });
+    @endif
+
+    // 2. SweetAlert Loading saat Simpan/Update
+    const forms = document.querySelectorAll('.form-proses');
+    forms.forEach(form => {
+        form.addEventListener('submit', function() {
+            Swal.fire({
+                title: 'Sedang Memproses...',
+                text: 'Harap tunggu sebentar',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        });
+    });
+
+    // 3. SweetAlert Konfirmasi Hapus + Loading
+    const deleteButtons = document.querySelectorAll('.btn-hapus');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const form = this.closest('form');
+            Swal.fire({
+                title: "Hapus Size?",
+                text: "Data stok untuk size ini akan hilang!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: "Ya, Hapus!",
+                cancelButtonText: "Batal"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Menghapus...',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
 @endsection

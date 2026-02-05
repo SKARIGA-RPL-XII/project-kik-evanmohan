@@ -21,12 +21,12 @@
 <body class="{{ $class ?? '' }}">
 
     {{-- TAMBAHAN: FULLSCREEN LOADER --}}
-    <div id="globalLoader">
+    {{-- <div id="globalLoader">
         <div class="loader-wrapper">
             <div class="spinner-border text-light" style="width: 3rem; height: 3rem" role="status"></div>
             <div class="loader-text">Loading...</div>
         </div>
-    </div>
+    </div> --}}
 
     <style>
         #globalLoader {
@@ -78,14 +78,12 @@
     </style>
 
     <script>
-        /* Loader hilang setelah halaman selesai */
         window.addEventListener("load", () => {
             setTimeout(() => {
                 document.getElementById("globalLoader").classList.add("hide");
             }, 300);
         });
 
-        /* Loader muncul ketika klik link pindah halaman */
         document.addEventListener("DOMContentLoaded", () => {
             const links = document.querySelectorAll("a:not([target='_blank'])");
 
@@ -113,7 +111,21 @@
         @if (in_array(request()->route()->getName(), ['login', 'register', 'sign-in-static', 'sign-up-static']))
             @yield('content')
         @else
-            <div class="min-height-300 bg-primary position-absolute w-100"></div>
+
+            <!-- 🔥 HEADER: GAMBAR SAMAR + WARNA ABU -->
+            <div class="min-height-300 bg-primary position-absolute w-100"
+                style="
+                    background-image:
+                        linear-gradient(
+                            rgba(128, 128, 128, 0.75),
+                            rgba(128, 128, 128, 0.75)
+                        ),
+                        url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signup-cover.jpg');
+                    background-size: cover;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                ">
+            </div>
 
             @if (auth()->user()->role === 'admin')
                 @include('layouts.navbar.auth.sidenav')

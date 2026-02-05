@@ -10,7 +10,7 @@ class Order extends Model
         'user_id',
         'nama',
         'telepon',
-        'alamat',     // ✔ alamat string
+        'alamat_id',     // ✔ alamat string
         'total_barang',
         'total_harga',
         'ongkir',
@@ -35,4 +35,9 @@ class Order extends Model
     {
         return $this->hasManyThrough(Product::class, OrderItem::class, 'order_id', 'id', 'id', 'product_id');
     }
+    public function alamat()
+{
+    return $this->belongsTo(\App\Models\Alamat::class);
+}
+
 }

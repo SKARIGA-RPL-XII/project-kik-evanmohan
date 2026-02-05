@@ -1,147 +1,211 @@
 @extends('layouts.navbar.auth.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
-    <style>
-        .carousel-img {
-            height: 250px;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-    </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <div class="container mt-4">
+<style>
+    /* --- EFEK ULTRA BLUR SAAT MODAL (Opsional jika kedepan pakai modal) --- */
+    body.modal-open #sidenav-main, body.modal-open .main-content {
+        filter: blur(15px);
+        transition: filter 0.3s ease;
+    }
 
-        <!-- ============================= -->
-        <!--        FORM TAMBAH IKLAN      -->
-        <!-- ============================= -->
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <strong>Tambah Iklan Baru</strong>
-            </div>
-            <div class="card-body">
-                <form action="{{ route('admin.iklan.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
+    /* --- LAYOUT STYLE --- */
+    .card-modern {
+        border: none !important;
+        border-radius: 16px !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05) !important;
+        background: #fff;
+    }
 
-                    <div class="mb-3">
-                        <label class="form-label">Judul Iklan</label>
-                        <input type="text" name="judul" class="form-control" required>
-                    </div>
+    .form-control, .form-select {
+        border-radius: 10px !important;
+        padding: 12px 15px !important;
+        border: 1px solid #e2e8f0 !important;
+        background-color: #f8fafc !important;
+    }
 
-                    <div class="mb-3">
-                        <label class="form-label">Gambar Iklan</label>
-                        <input type="file" name="gambar" class="form-control" accept="image/*" required>
-                    </div>
+    /* --- IKLAN CARD ITEM (PENGGANTI TABEL) --- */
+    .iklan-card {
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid #edf2f7;
+    }
 
-                    {{-- <div class="mb-3">
-                        <label class="form-label">Pilih Produk (Opsional)</label>
-                        <select name="product_id" class="form-select">
-                            <option value="">-- Tanpa Produk --</option>
-                            @foreach($produk as $p)
-                                <option value="{{ $p->id }}">{{ $p->nama_produk }}</option>
-                            @endforeach
-                        </select>
-                    </div> --}}
+    .iklan-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+    }
 
-                    <div class="mb-3">
-                        <label class="form-label">Status Iklan</label>
-                        <select name="status" class="form-select" required>
-                            <option value="ACTIVE">Aktif</option>
-                            <option value="INACTIVE">Tidak Aktif</option>
-                        </select>
-                    </div>
+    .img-container {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-bottom: 1px solid #edf2f7;
+    }
 
+    .status-pill {
+        font-size: 10px;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        padding: 5px 12px;
+        border-radius: 20px;
+    }
 
-                    <button class="btn btn-primary">Simpan Iklan</button>
-                </form>
+    /* --- BUTTONS --- */
+    .btn-custom-primary {
+        background-color: #ff855f !important;
+        color: white !important;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        padding: 12px;
+    }
+
+    .btn-outline-danger-custom {
+        color: #dc3545;
+        border: 1px solid #dc3545;
+        background: transparent;
+        border-radius: 8px;
+        font-size: 13px;
+        padding: 6px 12px;
+        transition: all 0.2s;
+    }
+
+    .btn-outline-danger-custom:hover {
+        background: #dc3545;
+        color: white;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="row g-4">
+
+        <div class="col-lg-4 col-md-5">
+            <div class="card card-modern h-100">
+                <div class="card-header bg-transparent pb-0 border-0">
+                    <h5 class="fw-bold text-dark mb-1">Upload Iklan</h5>
+                    <p class="text-sm text-muted">Tambahkan banner promosi baru ke aplikasi.</p>
+                </div>
+                <div class="card-body">
+                    <form action="{{ route('admin.iklan.store') }}" method="POST" enctype="multipart/form-data" id="formIklan">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-xs text-uppercase">Judul Banner</label>
+                            <input type="text" name="judul" class="form-control" placeholder="Masukkan judul iklan..." required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-xs text-uppercase">File Gambar</label>
+                            <input type="file" name="gambar" class="form-control" accept="image/*" required>
+                            <small class="text-muted text-xs mt-1 d-block">*Rekomendasi ukuran: 1200 x 600 px</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-xs text-uppercase">Status Tayang</label>
+                            <select name="status" class="form-select" required>
+                                <option value="ACTIVE">Aktif Sekarang</option>
+                                <option value="INACTIVE">Simpan Sebagai Draft</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-custom-primary w-100 shadow-sm">
+                            <i class="bi bi-plus-lg me-2"></i>Simpan & Publikasikan
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 
-        <!-- ============================= -->
-        <!--      PREVIEW CAROUSEL IKLAN   -->
-        <!-- ============================= -->
-        {{-- <div class="card mb-4">
-            <div class="card-header bg-success text-white">
-                <strong>Preview Carousel</strong>
-            </div>
-            <div class="card-body">
-                @if ($iklans->count() > 0)
-                    <div id="iklanCarousel" class="carousel slide" data-bs-ride="carousel">
-                        <div class="carousel-inner">
-                            @foreach ($iklans as $key => $iklan)
-                                <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
-                                    <img src="{{ asset('storage/' . $iklan->gambar) }}" class="d-block w-100 carousel-img">
-                                    <div class="carousel-caption d-none d-md-block">
-                                        <h5>{{ $iklan->judul }}</h5>
+        <div class="col-lg-8 col-md-7">
+            <div class="card card-modern h-100">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center border-0">
+                    <h5 class="fw-bold text-dark mb-0">Manajemen Konten Iklan</h5>
+                    <span class="badge bg-soft-primary text-primary px-3 py-2" style="background:#e0e7ff;">{{ $iklans->count() }} Total</span>
+                </div>
+
+                <div class="card-body">
+                    @if($iklans->count())
+                        <div class="row g-3">
+                            @foreach($iklans as $iklan)
+                            <div class="col-xl-6 col-12">
+                                <div class="iklan-card bg-white">
+                                    <img src="{{ asset('storage/' . $iklan->gambar) }}" class="img-container">
+                                    <div class="p-3">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="fw-bold mb-0 text-truncate" style="max-width: 70%;">{{ $iklan->judul }}</h6>
+                                            <span class="status-pill {{ $iklan->status == 'ACTIVE' ? 'bg-success text-white' : 'bg-secondary text-white' }}">
+                                                {{ $iklan->status }}
+                                            </span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                            <small class="text-muted text-xs">
+                                                <i class="bi bi-calendar3 me-1"></i> {{ $iklan->created_at->format('d/m/Y') }}
+                                            </small>
+
+                                            <form action="{{ route('admin.iklan.destroy', $iklan->id) }}" method="POST" class="m-0">
+                                                @csrf @method('DELETE')
+                                                <button type="button" class="btn-outline-danger-custom btn-hapus" data-judul="{{ $iklan->judul }}">
+                                                    <i class="bi bi-trash3 me-1"></i> Hapus
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
+                            </div>
                             @endforeach
                         </div>
-
-                        <button class="carousel-control-prev" type="button" data-bs-target="#iklanCarousel"
-                            data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon"></span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#iklanCarousel"
-                            data-bs-slide="next">
-                            <span class="carousel-control-next-icon"></span>
-                        </button>
-                    </div>
-                @else
-                    <p class="text-muted">Belum ada iklan tersedia</p>
-                @endif
-            </div>
-        </div> --}}
-
-        <!-- ============================= -->
-        <!--       LIST IKLAN (TABLE)      -->
-        <!-- ============================= -->
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <strong>Daftar Semua Iklan</strong>
-            </div>
-            <div class="card-body">
-                @if($iklans->count())
-                    <table class="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th>Gambar</th>
-                                <th>Judul</th>
-                                {{-- <th>Produk Terkait</th> --}}
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($iklans as $iklan)
-                                <tr>
-                                    <td width="120">
-                                        <img src="{{ asset('storage/' . $iklan->gambar) }}" width="100" class="rounded">
-                                    </td>
-                                    <td>{{ $iklan->judul }}</td>
-                                    {{-- <td>
-                                        @if($iklan->product)
-                                            <span class="badge bg-success">
-                                                {{ $iklan->product->nama_produk }}
-                                            </span>
-                                        @else
-                                            <span class="badge bg-secondary">Tidak Ada</span>
-                                        @endif
-                                    </td> --}}
-                                    <td width="150">
-                                        <form action="{{ route('admin.iklan.destroy', $iklan->id) }}" method="POST">
-                                            @csrf @method('DELETE')
-                                            <button class="btn btn-danger btn-sm">Hapus</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-
-                @else
-                    <p class="text-muted text-center">Belum ada iklan</p>
-                @endif
+                    @else
+                        <div class="text-center py-5">
+                            <img src="https://illustrations.popsy.co/gray/not-found.svg" style="width: 150px;" class="mb-3">
+                            <p class="text-muted">Belum ada konten iklan yang ditambahkan.</p>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
 
     </div>
+</div>
+
+{{-- Scripts --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // SweetAlert Konfirmasi Hapus
+        document.querySelectorAll('.btn-hapus').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const judul = this.getAttribute('data-judul');
+                const form = this.closest('form');
+
+                Swal.fire({
+                    title: 'Hapus Iklan?',
+                    text: `Konten "${judul}" akan dihapus permanen!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Hapus',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        // Loading saat submit form
+        document.getElementById('formIklan').addEventListener('submit', function() {
+            Swal.fire({
+                title: 'Sedang Memproses...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+        });
+    });
+</script>
 @endsection
