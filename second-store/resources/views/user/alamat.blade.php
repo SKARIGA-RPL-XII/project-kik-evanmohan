@@ -137,7 +137,7 @@ function editAlamat(data) {
     const form = document.getElementById('formAlamat');
     document.querySelector('#modalTambahAlamat .modal-title').textContent = 'Edit Alamat';
 
-    form.action = `/alamat/${data.id}`;
+    form.action = `/profil/alamat/${data.id}`;
     form.querySelector('[name="_method"]').value = 'PUT';
 
     form.nama_penerima.value = data.nama_penerima;

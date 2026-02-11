@@ -4,15 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kategori;
+use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     public function admin()
     {
+        // Ambil kategori terbaru
         $kategoris = Kategori::latest()->get();
 
-        // Ambil penghasilan per bulan tahun ini
+        // 1. Ambil penghasilan per bulan tahun ini
         $income = DB::table('orders')
             ->selectRaw('MONTH(created_at) as bulan, SUM(total_harga) as total')
             ->whereYear('created_at', date('Y'))
@@ -26,30 +28,37 @@ class DashboardController extends Controller
 
         for ($i = 1; $i <= 12; $i++) {
             $found = $income->firstWhere('bulan', $i);
-            $labels[] = date('M', mktime(0,0,0,$i,1));
-            $data[] = $found ? $found->total : 0;
+            $monthNameShort = date('M', mktime(0, 0, 0, $i, 1));
+            $monthNameFull = date('F', mktime(0, 0, 0, $i, 1));
+
+            $labels[] = $monthNameShort;
+            $total = $found ? $found->total : 0;
+            $data[] = $total;
             $tableData[] = [
-                'bulan' => date('F', mktime(0,0,0,$i,1)),
-                'total' => $found ? $found->total : 0
+                'bulan' => $monthNameFull,
+                'total' => $total
             ];
         }
 
-        return view('admin.dashboard', compact('kategoris', 'labels', 'data', 'tableData'));
+        // 2. Query Top Products (Gunakan join dan select yang tepat)
+        $topProducts = DB::table('order_items')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->select(
+                'products.id',
+                'products.nama_produk',
+                'products.image',
+                DB::raw('SUM(order_items.qty) as total_qty')
+            )
+            ->groupBy('products.id', 'products.nama_produk', 'products.image')
+            ->orderBy('total_qty', 'desc')
+            ->take(7)
+            ->get();
+
+        // 3. Kirim ke view
+        return view('admin.dashboard', compact('kategoris', 'labels', 'data', 'tableData', 'topProducts'));
     }
 
-    // METHOD LAIN TETAP (JANGAN DIHAPUS)
-    public function profile()
-    {
-        return view('admin.profile');
-    }
-
-    public function billing()
-    {
-        return view('admin.billing');
-    }
-
-    public function management()
-    {
-        return view('admin.management');
-    }
+    public function profile() { return view('admin.profile'); }
+    public function billing() { return view('admin.billing'); }
+    public function management() { return view('admin.management'); }
 }

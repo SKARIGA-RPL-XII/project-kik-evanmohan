@@ -2,145 +2,26 @@
 
 @section('content')
 <style>
-    body {
-        background-color: #f5f7fa;
-        font-family: 'Poppins', sans-serif;
-    }
-
-    .order-card {
-        background: #fff;
-        border-radius: 14px;
-        padding: 20px;
-        margin-bottom: 22px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
-        border: 1px solid #eee;
-        transition: .2s;
-    }
-
-    .order-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-    }
-
-    .order-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 14px;
-    }
-
-    .order-id {
-        font-size: 18px;
-        font-weight: 600;
-        color: #333;
-    }
-
-    .status-badge {
-        padding: 7px 12px;
-        border-radius: 10px;
-        font-size: 13px;
-        font-weight: 600;
-    }
-
-    .badge-paid {
-        background: #0263e0;
-        color: white;
-    }
-
-    .badge-pending {
-        background: #0263e0;
-        color: white;
-    }
-
-    .btn-tokped-pay {
-        background: #595959;
-        color: white;
-        border-radius: 10px;
-        padding: 10px 22px;
-        font-size: 14px;
-        font-weight: 600;
-        border: none;
-        text-decoration: none;
-        transition: .2s;
-    }
-
-    .btn-tokped-pay:hover {
-        background: #3d3d3d;
-    }
-
-    .btn-tokped-cancel {
-        background: red;
-        border: 1px solid #ff0000;
-        color: white;
-        border-radius: 10px;
-        padding: 10px 22px;
-        font-size: 14px;
-        font-weight: 600;
-        transition: .2s;
-    }
-
-    .btn-tokped-cancel:hover {
-        background: #cc0000;
-    }
-
-    .product-item {
-        padding: 10px 0;
-        border-bottom: 1px solid #eee;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .product-item img {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
-        border-radius: 8px;
-    }
-
-    .collapse-btn {
-        background: none;
-        border: none;
-        color: #007bff;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        padding: 5px 0;
-        transition: .2s;
-    }
-
-    .collapse-btn:hover {
-        color: #0056c7;
-    }
-
-    .empty-orders {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        min-height: 60vh;
-        text-align: center;
-    }
-
-    .empty-orders img {
-        max-width: 150px;
-        opacity: .8;
-        margin-bottom: 20px;
-    }
-
-    .product-details {
-        font-size: 14px;
-        color: #555;
-    }
-
-    .alamat-box {
-        font-size: 14px;
-        background: #f8f9fc;
-        padding: 10px;
-        border-radius: 8px;
-        margin-bottom: 10px;
-        border: 1px solid #e4e7ec;
-    }
+    body { background-color: #f5f7fa; font-family: 'Poppins', sans-serif; }
+    .order-card { background: #fff; border-radius: 14px; padding: 20px; margin-bottom: 22px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07); border: 1px solid #eee; transition: .2s; }
+    .order-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); }
+    .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .order-id { font-size: 18px; font-weight: 600; color: #333; }
+    .status-badge { padding: 7px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; }
+    .badge-paid { background: #0263e0; color: white; }
+    .badge-pending { background: #0263e0; color: white; }
+    .btn-tokped-pay { background: #595959; color: white; border-radius: 10px; padding: 10px 22px; font-size: 14px; font-weight: 600; border: none; text-decoration: none; transition: .2s; }
+    .btn-tokped-pay:hover { background: #3d3d3d; }
+    .btn-tokped-cancel { background: red; border: 1px solid #ff0000; color: white; border-radius: 10px; padding: 10px 22px; font-size: 14px; font-weight: 600; transition: .2s; }
+    .btn-tokped-cancel:hover { background: #cc0000; }
+    .product-item { padding: 10px 0; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px; }
+    .product-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+    .collapse-btn { background: none; border: none; color: #007bff; font-size: 15px; font-weight: 600; cursor: pointer; padding: 5px 0; transition: .2s; }
+    .collapse-btn:hover { color: #0056c7; }
+    .empty-orders { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 60vh; text-align: center; }
+    .empty-orders img { max-width: 150px; opacity: .8; margin-bottom: 20px; }
+    .product-details { font-size: 14px; color: #555; }
+    .alamat-box { font-size: 14px; background: #f8f9fc; padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e4e7ec; }
 </style>
 
 <div class="container payment-container">
@@ -200,16 +81,17 @@
             <div id="detail-{{ $order->id }}" class="collapse mt-3">
                 @foreach($order->items as $item)
                     <div class="product-item">
-                        <img src="{{ $item->product->image ? asset('storage/'.$item->product->image) : 'https://via.placeholder.com/60' }}" alt="{{ $item->product->nama_produk }}">
+                        <img src="{{ $item->product && $item->product->image ? asset('storage/'.$item->product->image) : 'https://via.placeholder.com/60' }}"
+                             alt="{{ $item->product->nama_produk ?? 'Produk Tidak Diketahui' }}">
                         <div>
-                            <div>{{ $item->product->nama_produk }}</div>
-                            @if($item->variant || $item->size)
+                            <div>{{ $item->product->nama_produk ?? 'Produk Tidak Diketahui' }}</div>
+                            @if(($item->variant && $item->variant->warna) || ($item->size && $item->size->size))
                                 <div class="product-details">
-                                    @if($item->variant)
-                                        Variant: {{ $item->variant->warna ?? '-' }}
+                                    @if($item->variant && $item->variant->warna)
+                                        Variant: {{ $item->variant->warna }}
                                     @endif
-                                    @if($item->size)
-                                        | Size: {{ $item->size->size ?? '-' }}
+                                    @if($item->size && $item->size->size)
+                                        | Size: {{ $item->size->size }}
                                     @endif
                                 </div>
                             @endif

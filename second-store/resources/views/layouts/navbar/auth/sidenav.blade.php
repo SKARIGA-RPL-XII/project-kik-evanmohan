@@ -92,7 +92,7 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link {{ Str::startsWith(Route::currentRouteName(), 'admin.bukti') ? 'active' : '' }}"
                         href="{{ route('admin.bukti.index') }}">
 
@@ -103,7 +103,7 @@
 
                         <span class="nav-link-text ms-1">Bukti Pembayaran</span>
                     </a>
-                </li>
+                </li> --}}
 
                 <li class="nav-item">
                     <a class="nav-link {{ Route::currentRouteName() == 'admin.orders.index' ? 'active' : '' }}"
@@ -181,7 +181,7 @@
                         <span class="nav-link-text ms-1">User Management</span>
                     </a>
                 </li>
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link " href="{{ route('login') }}">
                         <div
                             class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -198,7 +198,7 @@
                         </div>
                         <span class="nav-link-text ms-1">Register</span>
                     </a>
-                </li>
+                </li> --}}
             </ul>
         </div>
 

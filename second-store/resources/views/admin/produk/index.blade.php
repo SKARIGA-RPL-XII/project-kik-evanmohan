@@ -2,284 +2,273 @@
 
 @section('content')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
-<div class="row mt-4 mx-4">
-    <div class="col-12">
-        <div class="card mb-4">
-            <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-                <h6>Manajemen Produk</h6>
-                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambahProduk">
-                    + Tambah Produk
-                </button>
-            </div>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4 shadow-sm border-0">
+                {{-- HEADER --}}
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center bg-white">
+                    <div>
+                        <h5 class="mb-0 font-weight-bold text-dark">Manajemen Produk</h5>
+                        <p class="text-sm mb-0 text-muted">Kelola daftar produk, kategori, dan varian harga Anda di sini.</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm btn-round shadow-none mb-0" data-bs-toggle="modal" data-bs-target="#modalTambahProduk">
+                        <i class="fas fa-plus me-1"></i> Tambah Produk
+                    </button>
+                </div>
 
-            <div class="card-body px-0 pt-0 pb-2">
-                {{-- Alert success manual dikomentari karena sudah diganti SweetAlert Toast --}}
-                {{-- @if (session('success'))
-                    <div class="alert alert-success mx-3 mt-3">{{ session('success') }}</div>
-                @endif --}}
-
-                <div class="table-responsive p-3">
-                    <table class="table table-hover align-items-center mb-0">
-                        <thead class="bg-light">
-                            <tr>
-                                <th>Gambar</th>
-                                <th>Nama Produk</th>
-                                <th>Kategori</th>
-                                <th>Total Varian</th>
-                                <th class="text-center">Tanggal Dibuat</th>
-                                <th class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @forelse ($products as $p)
+                {{-- TABLE BODY --}}
+                <div class="card-body px-0 pt-0 pb-2 mt-3">
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0 table-hover">
+                            <thead class="bg-light text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                 <tr>
-                                    <td>
-                                        <img src="{{ $p->image ? asset('storage/' . $p->image) : asset('argon/assets/img/default-product.png') }}"
-                                             class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
-                                    </td>
-                                    <td>{{ $p->nama_produk }}</td>
-                                    <td>{{ $p->kategori->nama_kategori ?? '-' }}</td>
-                                    <td>{{ $p->variants->count() }} varian</td>
-                                    <td class="text-center">{{ $p->created_at->format('d/m/Y') }}</td>
-                                    <td class="text-center d-flex justify-content-center">
-                                        <a href="{{ route('admin.produk.variant.index', $p->id) }}"
-                                           class="btn btn-success btn-sm mx-1">
-                                           <i class="bi bi-sliders"></i> Kelola Variant
-                                        </a>
-
-                                        <button class="btn btn-warning btn-sm mx-1"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modalEditProduk{{ $p->id }}">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </button>
-
-                                        <form action="{{ route('admin.produk.destroy', $p->id) }}" method="POST" class="form-delete">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" class="btn btn-danger btn-sm mx-1 btn-hapus">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
-                                    </td>
+                                    <th class="ps-4">Produk</th>
+                                    <th class="ps-2">Kategori</th>
+                                    <th class="ps-2">Total Varian</th>
+                                    <th class="text-center">Tanggal Dibuat</th>
+                                    <th class="text-center">Aksi</th>
                                 </tr>
+                            </thead>
 
-                                <div class="modal fade" id="modalEditProduk{{ $p->id }}" tabindex="-1">
-                                    <div class="modal-dialog modal-dialog-centered modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Edit Produk</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <tbody>
+                                @forelse ($products as $p)
+                                    <tr>
+                                        <td class="ps-4">
+                                            <div class="d-flex align-items-center">
+                                                <div class="position-relative">
+                                                    <img src="{{ $p->image ? asset('storage/' . $p->image) : asset('argon/assets/img/default-product.png') }}"
+                                                         class="avatar avatar-md rounded-3 border shadow-sm"
+                                                         style="object-fit: cover;">
+                                                </div>
+                                                <div class="ms-3">
+                                                    <h6 class="mb-0 text-sm font-weight-bold text-dark">{{ $p->nama_produk }}</h6>
+                                                    <p class="text-xs text-muted mb-0">ID: #PROD-{{ $p->id }}</p>
+                                                </div>
                                             </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-sm bg-gradient-faded-light text-dark border shadow-none px-3">
+                                                {{ $p->kategori->nama_kategori ?? '-' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-layers text-primary me-2 text-xs"></i>
+                                                <span class="text-sm font-weight-bold">{{ $p->variants->count() }} <span class="text-muted text-xs">Variant</span></span>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="text-secondary text-xs">{{ $p->created_at->format('d M Y') }}</span>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <div class="btn-group shadow-none">
+                                                {{-- KELOLA VARIAN --}}
+                                                <a href="{{ route('admin.produk.variant.index', $p->id) }}"
+                                                   class="btn btn-link text-success px-2 mb-0" data-bs-toggle="tooltip" title="Kelola Variant">
+                                                    <i class="bi bi-sliders text-lg"></i>
+                                                </a>
 
-                                            <form action="{{ route('admin.produk.update', $p->id) }}" method="POST" enctype="multipart/form-data" class="form-proses">
-                                                @csrf
-                                                @method('PUT')
-                                                <div class="modal-body">
-                                                    <div class="row">
-                                                        <div class="col-md-6 mb-3">
-                                                            <label class="form-label">Nama Produk</label>
-                                                            <input type="text" name="nama_produk" class="form-control" value="{{ $p->nama_produk }}" required>
-                                                        </div>
+                                                {{-- EDIT --}}
+                                                <button class="btn btn-link text-warning px-2 mb-0"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#modalEditProduk{{ $p->id }}" title="Edit Produk">
+                                                    <i class="bi bi-pencil-square text-lg"></i>
+                                                </button>
 
-                                                        <div class="col-md-6 mb-3">
-                                                            <label class="form-label">Kategori</label>
-                                                            <select name="kategori_id" class="form-control" required>
-                                                                @foreach ($kategoris as $k)
-                                                                    <option value="{{ $k->id }}" {{ $p->kategori_id == $k->id ? 'selected' : '' }}>
-                                                                        {{ $k->nama_kategori }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
+                                                {{-- DELETE --}}
+                                                <form action="{{ route('admin.produk.destroy', $p->id) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button" class="btn btn-link text-danger px-2 mb-0 btn-hapus" title="Hapus Produk">
+                                                        <i class="bi bi-trash text-lg"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
 
-                                                        <div class="col-md-6 mb-3">
-                                                            <label class="form-label">Gambar Produk</label>
-                                                            <input type="file" name="image" class="form-control image-cropper-input">
-                                                            @if ($p->image)
-                                                                <img src="{{ asset('storage/' . $p->image) }}" class="mt-2 rounded" style="width:80px; height:80px; object-fit:cover;">
-                                                            @endif
-                                                        </div>
-
-                                                        <div class="col-12 mb-3">
-                                                            <label class="form-label">Deskripsi</label>
-                                                            <textarea name="deskripsi" class="form-control" rows="3">{{ $p->deskripsi }}</textarea>
+                                    {{-- MODAL EDIT PRODUK --}}
+                                    <div class="modal fade" id="modalEditProduk{{ $p->id }}" tabindex="-1">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                            <div class="modal-content border-0 shadow-lg">
+                                                <div class="modal-header border-bottom-0">
+                                                    <h6 class="modal-title font-weight-bold">Edit Detail Produk</h6>
+                                                    <button type="button" class="btn-close text-dark" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <form action="{{ route('admin.produk.update', $p->id) }}" method="POST" enctype="multipart/form-data" class="form-proses">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <div class="modal-body py-0">
+                                                        <div class="row">
+                                                            <div class="col-md-6 mb-3">
+                                                                <label class="form-control-label">Nama Produk</label>
+                                                                <input type="text" name="nama_produk" class="form-control" value="{{ $p->nama_produk }}" required>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <label class="form-control-label">Kategori</label>
+                                                                <select name="kategori_id" class="form-control shadow-none" required>
+                                                                    @foreach ($kategoris as $k)
+                                                                        <option value="{{ $k->id }}" {{ $p->kategori_id == $k->id ? 'selected' : '' }}>{{ $k->nama_kategori }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-12 mb-3">
+                                                                <label class="form-control-label">Ganti Gambar Produk</label>
+                                                                <input type="file" name="image" class="form-control image-cropper-input">
+                                                                <p class="text-xxs text-muted mt-1">*Gambar yang diunggah akan masuk ke mode Crop</p>
+                                                            </div>
+                                                            <div class="col-md-12 mb-3">
+                                                                <label class="form-control-label">Deskripsi</label>
+                                                                <textarea name="deskripsi" class="form-control" rows="3">{{ $p->deskripsi }}</textarea>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                    <button type="submit" class="btn btn-primary">Simpan</button>
-                                                </div>
-                                            </form>
+                                                    <div class="modal-footer border-top-0">
+                                                        <button type="button" class="btn btn-link text-secondary mb-0" data-bs-dismiss="modal">Batal</button>
+                                                        <button type="submit" class="btn btn-primary shadow-none mb-0">Update Produk</button>
+                                                    </div>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-
-                            @empty
-                                <tr>
-                                    <td colspan="8" class="text-center text-muted py-4">Belum ada produk.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-
-                    </table>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center py-5">
+                                            <i class="bi bi-box-seam text-secondary d-block text-xl mb-2"></i>
+                                            <span class="text-secondary text-sm font-weight-bold">Opps! Belum ada produk tersedia.</span>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+{{-- MODAL TAMBAH PRODUK --}}
 <div class="modal fade" id="modalTambahProduk" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-bottom-0">
+                <h6 class="modal-title font-weight-bold">Buat Produk Baru</h6>
+                <button type="button" class="btn-close text-dark" data-bs-dismiss="modal"></button>
+            </div>
             <form action="{{ route('admin.produk.store') }}" method="POST" enctype="multipart/form-data" class="form-proses">
                 @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title">Tambah Produk</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
+                <div class="modal-body py-0">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Nama Produk</label>
-                            <input type="text" name="nama_produk" class="form-control" required>
+                            <label class="form-control-label text-xs">Nama Produk</label>
+                            <input type="text" name="nama_produk" class="form-control" placeholder="Nama Barang" required>
                         </div>
-
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Kategori</label>
+                            <label class="form-control-label text-xs">Pilih Kategori</label>
                             <select name="kategori_id" class="form-control" required>
-                                <option value="">-- Pilih Kategori --</option>
+                                <option value="">-- Pilih --</option>
                                 @foreach ($kategoris as $k)
                                     <option value="{{ $k->id }}">{{ $k->nama_kategori }}</option>
                                 @endforeach
                             </select>
                         </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Gambar Produk</label>
-                            <input type="file" name="image" class="form-control image-cropper-input">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-control-label text-xs">Upload Gambar</label>
+                            <input type="file" name="image" class="form-control image-cropper-input shadow-none">
                         </div>
-
                         <div class="col-12 mb-3">
-                            <label class="form-label">Deskripsi</label>
-                            <textarea name="deskripsi" class="form-control" rows="3"></textarea>
+                            <label class="form-control-label text-xs">Deskripsi Singkat</label>
+                            <textarea name="deskripsi" class="form-control" rows="3" placeholder="Informasi detail produk..."></textarea>
                         </div>
                     </div>
                 </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-link text-secondary mb-0" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary shadow-none mb-0">Simpan Produk</button>
                 </div>
-
             </form>
         </div>
     </div>
 </div>
 
-
-<div class="modal fade" id="modalCropImage" tabindex="-1">
+{{-- MODAL CROPPER --}}
+<div class="modal fade" id="modalCropImage" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Crop Gambar Produk</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white border-bottom-0">
+                <h6 class="modal-title text-white font-weight-bold">Sesuaikan Ukuran Gambar (1:1)</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-
-            <div class="modal-body">
-                <img id="previewCrop" style="width:100%; max-height:500px; object-fit:contain;">
+            <div class="modal-body bg-gray-100">
+                <div class="img-container">
+                    <img id="previewCrop" style="max-width: 100%;">
+                </div>
             </div>
-
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button id="btnCrop" class="btn btn-primary">Gunakan Gambar</button>
+                <button class="btn btn-link text-secondary mb-0" data-bs-dismiss="modal">Batal</button>
+                <button id="btnCrop" class="btn btn-primary shadow-none mb-0">Potong & Gunakan</button>
             </div>
-
         </div>
     </div>
 </div>
 
-{{-- SweetAlert2 Script --}}
+{{-- SCRIPTS --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-
-    // 1. CONFIG SWEETALERT TOAST
+    // 1. TOAST NOTIFICATION
     const Toast = Swal.mixin({
         toast: true,
         position: "top-end",
         showConfirmButton: false,
         timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-        }
+        timerProgressBar: true
     });
 
-    // Munculkan Toast jika ada session sukses
     @if (session('success'))
-        Toast.fire({
-            icon: "success",
-            title: "{{ session('success') }}"
-        });
+        Toast.fire({ icon: "success", title: "{{ session('success') }}" });
     @endif
 
-    // 2. LOADING STATE SAAT SUBMIT FORM
-    const forms = document.querySelectorAll('.form-proses');
-    forms.forEach(form => {
+    // 2. FORM LOADING STATE
+    document.querySelectorAll('.form-proses').forEach(form => {
         form.addEventListener('submit', function() {
             Swal.fire({
-                title: 'Memproses...',
-                text: 'Harap tunggu sebentar',
+                title: 'Sedang Menyimpan...',
                 allowOutsideClick: false,
                 showConfirmButton: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
+                didOpen: () => { Swal.showLoading(); }
             });
         });
     });
 
-    // 3. KONFIRMASI HAPUS DENGAN LOADING
-    const deleteButtons = document.querySelectorAll('.btn-hapus');
-    deleteButtons.forEach(button => {
+    // 3. DELETE CONFIRMATION
+    document.querySelectorAll('.btn-hapus').forEach(button => {
         button.addEventListener('click', function() {
             const form = this.closest('form');
             Swal.fire({
-                title: "Apakah Anda yakin?",
-                text: "Produk akan dihapus permanen!",
+                title: "Hapus Produk?",
+                text: "Semua varian dan histori produk ini akan terhapus!",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#6c757d",
+                confirmButtonColor: "#f5365c",
                 confirmButtonText: "Ya, Hapus!",
                 cancelButtonText: "Batal"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Menghapus...',
-                        allowOutsideClick: false,
-                        showConfirmButton: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
+                    Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => { Swal.showLoading(); } });
                     form.submit();
                 }
             });
         });
     });
 
-    // 4. LOGIKA CROPPER JS
+    // 4. CROPPER JS LOGIC
     let cropper;
     let targetInput;
 
@@ -299,10 +288,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 cropper = new Cropper(document.getElementById('previewCrop'), {
                     aspectRatio: 1,
-                    viewMode: 1,
+                    viewMode: 2,
                     autoCropArea: 1,
-                    movable: true,
-                    zoomable: true
                 });
             };
             reader.readAsDataURL(file);
@@ -311,22 +298,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('btnCrop').addEventListener('click', function () {
         if (!cropper) return;
-
-        const canvas = cropper.getCroppedCanvas({
-            width: 600,
-            height: 600
-        });
-
+        const canvas = cropper.getCroppedCanvas({ width: 600, height: 600 });
         canvas.toBlob(blob => {
-            const croppedFile = new File([blob], "cropped.jpg", { type: "image/jpeg" });
+            const croppedFile = new File([blob], "product.jpg", { type: "image/jpeg" });
             const dt = new DataTransfer();
             dt.items.add(croppedFile);
             targetInput.files = dt.files;
-
             bootstrap.Modal.getInstance(document.getElementById('modalCropImage')).hide();
         }, "image/jpeg", 0.9);
     });
 });
 </script>
 
+<style>
+    .avatar-md { width: 50px; height: 50px; }
+    .form-control-label { font-size: 0.75rem; font-weight: 700; color: #525f7f; margin-bottom: 0.5rem; display: block; }
+    .btn-round { border-radius: 50px; }
+    .text-lg { font-size: 1.1rem !important; }
+</style>
 @endsection

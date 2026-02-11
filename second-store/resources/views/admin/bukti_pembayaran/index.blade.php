@@ -1,3 +1,4 @@
+{{--
 @extends('layouts.navbar.auth.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
@@ -36,7 +37,6 @@
                                 <tr>
                                     <td>{{ $b->id }}</td>
 
-                                    {{-- Tampilkan kode order --}}
                                     <td>#
                                         {{ $b->order->kode_order ?? '-' }}
                                     </td>
@@ -53,13 +53,11 @@
 
                                     <td class="text-center">
 
-                                        {{-- Detail --}}
                                         <a href="{{ route('admin.bukti.show', $b->id) }}"
                                            class="btn btn-primary btn-sm">
                                             Detail
                                         </a>
 
-                                        {{-- Hapus --}}
                                         <form action="{{ route('admin.bukti.destroy', $b->id) }}"
                                             method="POST" class="d-inline"
                                             onsubmit="return confirm('Hapus bukti ini?')">
@@ -88,3 +86,4 @@
     </div>
 </div>
 @endsection
+--}}
