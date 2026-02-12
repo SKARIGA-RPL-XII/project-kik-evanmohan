@@ -36,8 +36,12 @@ class Order extends Model
         return $this->hasManyThrough(Product::class, OrderItem::class, 'order_id', 'id', 'id', 'product_id');
     }
     public function alamat()
-{
-    return $this->belongsTo(\App\Models\Alamat::class);
-}
+    {
+        return $this->belongsTo(\App\Models\Alamat::class);
+    }
 
+    public function alamatUtama()
+    {
+        return $this->hasOne(Alamat::class)->where('is_utama', 1);
+    }
 }

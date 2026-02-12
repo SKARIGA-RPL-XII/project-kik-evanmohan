@@ -66,6 +66,7 @@
             @if($order->alamat)
                 <div class="alamat-box">
                     <strong>Alamat Pengiriman:</strong><br>
+                    {{ $order->alamat->nama_penerima }}
                     {{ $order->alamat->alamat_lengkap ?? '-' }},
                     {{ $order->alamat->kecamatan ?? '-' }},
                     {{ $order->alamat->kota ?? '-' }},

@@ -8,48 +8,56 @@ use Illuminate\Http\Request;
 class FavoritController extends Controller
 {
     /**
-     * Tambah ke favorit berdasarkan variant & size
+     * Digunakan oleh tombol Heart di Detail Produk (Toggle System)
      */
-    public function store(Request $request)
+    public function store(Request $request, $produk_id)
     {
-        $data = [
-            'user_id' => auth()->id(),
-            'produk_id' => $request->produk_id,
-        ];
+        $userId = auth()->id();
 
-        Favorit::firstOrCreate($data);
+        // Cari apakah sudah ada di favorit
+        $fav = Favorit::where('user_id', $userId)
+                      ->where('produk_id', $produk_id)
+                      ->first();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Produk ditambahkan ke favorit'
-        ]);
-    }
-
-
-    /**
-     * Hapus favorit berdasarkan produk + variant + size
-     */
-    public function destroy(Request $request)
-    {
-        Favorit::where('user_id', auth()->id())
-            ->where('produk_id', $request->produk_id)
-            ->delete();
-
-        if ($request->ajax()) {
+        if ($fav) {
+            $fav->delete();
             return response()->json([
                 'success' => true,
+                'status' => 'removed',
                 'message' => 'Produk dihapus dari favorit'
             ]);
         }
 
-        return back()->with('success', 'Produk dihapus dari favorit!');
+        Favorit::create([
+            'user_id' => $userId,
+            'produk_id' => $produk_id,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'status' => 'added',
+            'message' => 'Produk ditambahkan ke favorit'
+        ]);
     }
 
-
-
     /**
-     * List semua favorit user
+     * Digunakan oleh tombol "X" di Daftar Favorit (Hapus berdasarkan ID Favorit)
      */
+    public function destroy($id)
+    {
+        // Cari berdasarkan ID favorit, bukan ID produk
+        $favorit = Favorit::where('id', $id)
+                          ->where('user_id', auth()->id())
+                          ->first();
+
+        if ($favorit) {
+            $favorit->delete();
+            return back()->with('success', 'Produk dihapus dari favorit!');
+        }
+
+        return back()->with('error', 'Produk gagal dihapus.');
+    }
+
     public function index(Request $request)
     {
         $user = auth()->user();

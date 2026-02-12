@@ -212,9 +212,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('pesanan.index')
         ->middleware('auth');
 
+    // Favorit System
     Route::get('/favorit', [FavoritController::class, 'index'])->name('favorit.index');
+    Route::delete('/favorit/delete/{id}', [FavoritController::class, 'destroy'])->name('favorit.destroy');
     Route::post('/favorit/{produk_id}', [FavoritController::class, 'store'])->name('favorit.store');
-    Route::delete('/favorit/{produk_id}', [FavoritController::class, 'destroy'])->name('favorit.destroy');
 });
 
 

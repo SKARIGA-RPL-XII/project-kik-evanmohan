@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\BuktiPembayaran;
 use App\Models\LaporanPesanan;
 use App\Models\Order;
+use Illuminate\Support\Facades\DB; // Tambahkan ini
+use Illuminate\Support\Facades\Storage;
 use App\Models\ProductVariantSize;
 use Illuminate\Http\Request;
 
@@ -117,9 +119,37 @@ class BuktiPembayaranController extends Controller
      */
     public function destroy($id)
     {
-        $bukti = BuktiPembayaran::findOrFail($id);
-        $bukti->delete();
+        DB::beginTransaction();
 
-        return back()->with('success', 'Bukti pembayaran dihapus.');
+        try {
+            // 1. Cari data bukti pembayaran
+            $bukti = BuktiPembayaran::findOrFail($id);
+
+            // 2. Ambil referensi Order-nya
+            $order = Order::with('items')->find($bukti->order_id);
+
+            // 3. Hapus file fisik bukti pembayaran dari storage (Opsional)
+            if ($bukti->bukti_transfer && Storage::disk('public')->exists($bukti->bukti_transfer)) {
+                Storage::disk('public')->delete($bukti->bukti_transfer);
+            }
+
+            // 4. Hapus Bukti Pembayaran
+            $bukti->delete();
+
+            // 5. Hapus Order dan Item-nya
+            if ($order) {
+                // Hapus item-item order terlebih dahulu
+                $order->items()->delete();
+                // Hapus order-nya
+                $order->delete();
+            }
+
+            DB::commit();
+            return back()->with('success', 'Seluruh data pesanan dan bukti pembayaran berhasil dihapus permanen.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Gagal menghapus data: ' . $e->getMessage());
+        }
     }
 }
